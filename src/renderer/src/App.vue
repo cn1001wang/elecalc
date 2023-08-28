@@ -1,97 +1,138 @@
 <script setup lang="ts">
-import Versions from './components/Versions.vue'
+import { ref, Ref } from 'vue'
+import getTimeMapByExcel from './core/getTimeMapByExcel'
+import timeCalc from './core/timeCalc'
+
+const inputValue: Ref<string> = ref('')
+const outputValue: Ref<string> = ref('')
+const totalHour: Ref<number> = ref(0)
+const totalNum: Ref<number> = ref(0)
+// @ts-ignore (define in dts)
+const myAlert = window.api.alert
+function doCalc(): void {
+  const str = inputValue.value.trim()
+  if (str === '') {
+    myAlert('无数据！')
+    return
+  }
+
+  const allData = str.split('\n').map((o) => o.split('\t'))
+  if (allData[0].length !== 6) {
+    myAlert('数据长度错误！')
+    return
+  }
+
+  const objData = allData.map((row) => {
+    const length = Number(row[1])
+    const width = Number(row[2])
+    const height = Number(row[4])
+    const time = Number(row[5])
+    return {
+      type: row[0],
+      // 长边为长，短边为宽
+      length: length > width ? length : width,
+      width: length > width ? width : length,
+      height: height,
+      time: time
+    }
+  })
+  const result: Array<number> = timeCalc(objData)
+  totalHour.value = Number(result.reduce((a, b) => a + b, 0).toFixed(2))
+  totalNum.value = result.length
+  outputValue.value = result.join('\r\n')
+
+  inInput.value!.scrollTop = 0
+}
+
+function doSetting(): void {
+  const str = inputValue.value.trim()
+  if (str === '') {
+    myAlert('无数据！')
+    return
+  }
+  const allData = str.split('\n').map((o) => o.split('\t'))
+  // console.log(allData)
+  const result = getTimeMapByExcel(allData)
+  outputValue.value = JSON.stringify(result)
+  // console.log(JSON.stringify(result))
+}
+const inInput = ref<null | HTMLInputElement>(null)
+const outInput = ref<null | HTMLInputElement>(null)
+function handleScroll(e): void {
+  // e.target.scrollTop
+  if (e.target === outInput.value) {
+    inInput.value!.scrollTop = e.target.scrollTop
+  } else {
+    outInput.value!.scrollTop = e.target.scrollTop
+  }
+}
+// 清除数据
+function doClear(): void {
+  inputValue.value = ''
+  outputValue.value = ''
+}
 </script>
 
 <template>
-  <Versions></Versions>
-
-  <svg class="hero-logo" viewBox="0 0 900 300">
-    <use xlink:href="./assets/icons.svg#electron" />
-  </svg>
-  <h2 class="hero-text">You've successfully created an Electron project with Vue and TypeScript</h2>
-  <p class="hero-tagline">Please try pressing <code>F12</code> to open the devTool</p>
-
-  <div class="links">
-    <div class="link-item">
-      <a target="_blank" href="https://evite.netlify.app">Documentation</a>
+  <button v-show="true" @click="doSetting">配置</button>
+  <div class="input-wrap">
+    <div class="input-left">
+      <p>输入区</p>
+      <textarea ref="inInput" v-model="inputValue" rows="35" @scroll="handleScroll"></textarea>
     </div>
-    <div class="link-item link-dot">•</div>
-    <div class="link-item">
-      <a target="_blank" href="https://github.com/alex8088/electron-vite">Getting Help</a>
+    <div class="input-space">
+      <button class="r-btn btn-15" @click="doCalc">计算</button>
+      <button class="r-btn btn-15 btn-red" style="margin-top: 200px" @click="doClear">清除</button>
     </div>
-    <div class="link-item link-dot">•</div>
-    <div class="link-item">
-      <a
-        target="_blank"
-        href="https://github.com/alex8088/quick-start/tree/master/packages/create-electron"
-      >
-        create-electron
-      </a>
+    <div class="input-right">
+      <p>输出区</p>
+      <textarea
+        ref="outInput"
+        v-model="outputValue"
+        cols="30"
+        rows="35"
+        @scroll="handleScroll"
+      ></textarea>
     </div>
   </div>
-
-  <div class="features">
-    <div class="feature-item">
-      <article>
-        <h2 class="title">Configuring</h2>
-        <p class="detail">
-          Config with <span>electron.vite.config.ts</span> and refer to the
-          <a target="_blank" href="https://evite.netlify.app/config/">config guide</a>.
-        </p>
-      </article>
-    </div>
-    <div class="feature-item">
-      <article>
-        <h2 class="title">HMR</h2>
-        <p class="detail">
-          Edit <span>src/renderer</span> files to test HMR. See
-          <a target="_blank" href="https://evite.netlify.app/guide/hmr-in-renderer.html">docs</a>.
-        </p>
-      </article>
-    </div>
-    <div class="feature-item">
-      <article>
-        <h2 class="title">Hot Reloading</h2>
-        <p class="detail">
-          Run <span>'electron-vite dev --watch'</span> to enable. See
-          <a target="_blank" href="https://evite.netlify.app/guide/hot-reloading.html">docs</a>.
-        </p>
-      </article>
-    </div>
-    <div class="feature-item">
-      <article>
-        <h2 class="title">Debugging</h2>
-        <p class="detail">
-          Check out <span>.vscode/launch.json</span>. See
-          <a target="_blank" href="https://evite.netlify.app/guide/debugging.html">docs</a>.
-        </p>
-      </article>
-    </div>
-    <div class="feature-item">
-      <article>
-        <h2 class="title">Source Code Protection</h2>
-        <p class="detail">
-          Supported via built-in plugin <span>bytecodePlugin</span>. See
-          <a target="_blank" href="https://evite.netlify.app/guide/source-code-protection.html">
-            docs
-          </a>
-          .
-        </p>
-      </article>
-    </div>
-    <div class="feature-item">
-      <article>
-        <h2 class="title">Packaging</h2>
-        <p class="detail">
-          Use
-          <a target="_blank" href="https://www.electron.build">electron-builder</a>
-          and pre-configured to pack your app.
-        </p>
-      </article>
-    </div>
-  </div>
+  <p class="total-p">
+    一共 <b>{{ totalNum }}</b> 个任务，合计需 <b>{{ totalHour }}</b> h
+  </p>
 </template>
 
 <style lang="less">
 @import './assets/css/styles.less';
+.input-wrap {
+  display: flex;
+  max-width: 840px;
+  margin: 0 auto;
+  padding: 15px 30px 0 30px;
+}
+.input-space {
+  width: 48px;
+  flex-shrink: 0;
+  .r-btn {
+    margin: 0 5px;
+  }
+}
+.input-left {
+  flex: 1;
+}
+.input-right {
+  max-width: 300px;
+}
+.input-left,
+.input-right {
+  p {
+    text-align: center;
+  }
+  textarea {
+    width: 100%;
+    padding: 10px;
+    box-sizing: border-box;
+  }
+}
+.total-p {
+  text-align: center;
+}
 </style>

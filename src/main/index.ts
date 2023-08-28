@@ -1,6 +1,7 @@
-import { app, shell, BrowserWindow } from 'electron'
+import { app, shell, BrowserWindow, ipcMain } from 'electron'
 import * as path from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
+import alert from './alert'
 
 function createWindow(): void {
   // Create the browser window.
@@ -8,6 +9,7 @@ function createWindow(): void {
     width: 900,
     height: 670,
     show: false,
+    title: '放电计算器',
     autoHideMenuBar: true,
     ...(process.platform === 'linux'
       ? {
@@ -19,6 +21,7 @@ function createWindow(): void {
       sandbox: false
     }
   })
+  ipcMain.handle('alert', (_event: any, str: any) => alert(str))
 
   mainWindow.on('ready-to-show', () => {
     mainWindow.show()
