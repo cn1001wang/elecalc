@@ -74,7 +74,7 @@ function doClear(): void {
 </script>
 
 <template>
-  <button v-show="true" @click="doSetting">配置</button>
+  <button v-show="false" @click="doSetting">配置</button>
   <div class="input-wrap">
     <div class="input-left">
       <p>输入区</p>
