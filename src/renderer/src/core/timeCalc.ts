@@ -29,7 +29,7 @@ export default function timeCalc(objData: Array<any>): Array<number> {
     const timeMulti = o.time >= 3 ? 1.5 : o.time === 2 ? 1.3 : 1
 
     if (o.width && o.length && height) {
-      return getCostTimeByWLH(o.type, totalWL, height, timeMulti)
+      return Math.round(getCostTimeByWLH(o.type, totalWL, height) * timeMulti * 100) / 100
     } else {
       return 0
     }
@@ -41,21 +41,16 @@ export default function timeCalc(objData: Array<any>): Array<number> {
  * @param totalWL 长宽和
  * @param height 高
  */
-function getCostTimeByWLH(
-  type: string,
-  totalWL: number,
-  height: number,
-  timeMulti: number
-): number {
+function getCostTimeByWLH(type: string, totalWL: number, height: number): number {
   const timeTypeMap = timeMap[type]
   // 只有筋位会大于1次，2次按1.3倍时长计算，3次按1.5倍时长计算
   let costTime
 
   if (totalWL > 200) {
-    costTime = timeTypeMap[200][height] + getCostTimeByWLH(type, totalWL - 200, height, timeMulti)
+    costTime = timeTypeMap[200][height] + getCostTimeByWLH(type, totalWL - 200, height)
   } else {
     costTime = timeTypeMap[totalWL < 20 ? 20 : totalWL][height]
   }
 
-  return Math.round(costTime * timeMulti * 100) / 100
+  return costTime
 }
