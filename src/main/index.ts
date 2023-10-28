@@ -18,7 +18,8 @@ function createWindow(): void {
       : {}),
     webPreferences: {
       preload: path.join(__dirname, '../preload/index.js'),
-      sandbox: false
+      sandbox: false,
+      webSecurity: false
     }
   })
   ipcMain.handle('alert', (_event: any, str: any) => alert(str))
@@ -26,6 +27,17 @@ function createWindow(): void {
   mainWindow.on('ready-to-show', () => {
     mainWindow.show()
   })
+  mainWindow.webContents.openDevTools()
+
+  // mainWindow.webContents.session.webRequest.onHeadersReceived((details, callback) => {
+  //   callback({
+  //     responseHeaders: {
+  //       'Access-Control-Allow-Origin': ['*'],
+  //       'Content-Security-Policy': ["connect-src 'self' www.imouldyun.com"],
+  //       ...details.responseHeaders
+  //     }
+  //   })
+  // })
 
   mainWindow.webContents.setWindowOpenHandler((details) => {
     shell.openExternal(details.url)
