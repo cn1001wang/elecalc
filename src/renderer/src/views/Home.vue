@@ -5,18 +5,33 @@ import { useRouter, Router } from 'vue-router'
 import ajax from '../lib/axios/index'
 import getTimeMapByExcel from '../core/getTimeMapByExcel'
 import timeCalc from '../core/timeCalc'
+import { ElMessage } from 'element-plus'
 
 const router: Router = useRouter()
-onBeforeMount(() => {
-  ajax(`/api/auth/programmacinfo/getMacValid?mac=${window.api.mac}&ProgramType=elecalc`)
+onBeforeMount(async () => {
+  function replaceLogin(): void {
+    window.abp.auth.clearToken()
+    router.replace('/login')
+  }
+  await ajax(`/api/auth/programmacinfo/getMacValid?mac=${window.api.mac}&ProgramType=elecalc`)
     .then((res) => {
       if (!res) {
-        router.replace('/login')
+        replaceLogin()
       }
     })
     .catch(() => {
-      router.replace('/login')
+      replaceLogin()
     })
+  const res: string[] = await ajax(
+    `/api/services/app/Resource/GetBindedFlagNames?id=${window.abp.session.tenantId}&type=Master.MultiTenancy.Tenant`
+  )
+  if (!res || !res.includes('电火花计算器')) {
+    ElMessage({
+      message: '当前账号无权限，请联系管理员添加',
+      type: 'warning'
+    })
+    replaceLogin()
+  }
 })
 
 const inputValue: Ref<string> = ref('')

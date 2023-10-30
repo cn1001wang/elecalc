@@ -40,13 +40,19 @@ const doSubmit = async () => {
     <div class="form-wrap">
       <el-form :model="form" label-width="120px">
         <el-form-item label="账套">
-          <el-input v-model="form.tenancyName" size="large" />
+          <el-input v-model="form.tenancyName" size="large" name="tenancyName" />
         </el-form-item>
         <el-form-item label="用户名">
-          <el-input v-model="form.userName" size="large" />
+          <el-input v-model="form.userName" size="large" name="userName" />
         </el-form-item>
         <el-form-item label="密码">
-          <el-input v-model="form.password" size="large" type="password" @keyup.enter="doSubmit" />
+          <el-input
+            v-model="form.password"
+            size="large"
+            type="password"
+            name="password"
+            @keyup.enter="doSubmit"
+          />
         </el-form-item>
         <el-form-item label="">
           <el-button type="primary" style="width: 100%" @click="doSubmit">登录</el-button>

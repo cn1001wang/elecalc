@@ -51,7 +51,8 @@ _axios.interceptors.response.use(
   (e) => {
     console.log(e)
     const myAlert = window.api.alert
-    myAlert(e.message)
+
+    myAlert(e.response?.data?.message ?? e.message)
   }
 )
 

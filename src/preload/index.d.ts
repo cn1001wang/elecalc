@@ -7,5 +7,6 @@ declare global {
       mac: string
       alert: any
     }
+    abp: any
   }
 }
