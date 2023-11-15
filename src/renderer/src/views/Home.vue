@@ -68,7 +68,9 @@ function doCalc(): void {
 
     const width = Number(row[2])
 
-    const height = Number(row[4])
+    const height = Number(row[3]) - 3
+
+    const keepSpace = row[4] === '是'
 
     const time = Number(row[5])
 
@@ -82,6 +84,8 @@ function doCalc(): void {
       width: length > width ? width : length,
 
       height: height,
+
+      keepSpace: keepSpace,
 
       time: time
     }
@@ -146,7 +150,9 @@ function doClear(): void {
 
   <div class="input-wrap">
     <div class="input-left">
-      <p>输入区</p>
+      <p>
+        输入区<small style="font-size: 13px">(电极类型 / 长 / 宽 / 高 / 避空 / 放电次数)</small>
+      </p>
 
       <textarea ref="inInput" v-model="inputValue" rows="35" @scroll="handleScroll"></textarea>
     </div>

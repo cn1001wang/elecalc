@@ -29,7 +29,11 @@ export default function timeCalc(objData: Array<any>): Array<number> {
     const timeMulti = o.time >= 3 ? 1.5 : o.time === 2 ? 1.3 : 1
 
     if (o.width && o.length && height) {
-      return Math.round(getCostTimeByWLH(o.type, totalWL, height) * timeMulti * 100) / 100
+      return (
+        Math.round(
+          getCostTimeByWLH(o.type, totalWL, height) * timeMulti * 100 * (o.keepSpace ? 0.5 : 1)
+        ) / 100
+      )
     } else {
       return 0
     }
